@@ -3,8 +3,10 @@ package com.example.android_ftp;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -32,9 +34,9 @@ import org.apache.commons.net.util.TrustManagerUtils;
 
 public class MainActivity extends AppCompatActivity {
 
-    FTPClient client;
+    public asyncConnexion engine;
     private String sFTP = "";
-    private String sPort ="";
+    private int sPort = 0;
     private String sUser = "";
     private String sPassword = "";
     private EditText ip;
@@ -45,7 +47,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        client = new FTPClient();
         ip = findViewById(R.id.ipfield);
         port = findViewById(R.id.portfield);
         user = findViewById(R.id.userfield);
@@ -55,25 +56,24 @@ public class MainActivity extends AppCompatActivity {
     protected boolean checkserver(){
         boolean valid = false;
         //obtener valores de campos
+        sPort = Integer.parseInt(port.getText().toString());
+        //sFTP = "ftp://"+ip.getText().toString()+sPort;
         sFTP = ip.getText().toString();
-        sPort = port.getText().toString();
         sUser = user.getText().toString();
         sPassword = pass.getText().toString();
         try {
-            client.connect(sFTP);
-            valid = client.login(sUser,sPassword);
+           valid = connect(sFTP,sUser,sPassword,sPort);
         }
         catch (Exception e) {
             Toast toast1 =
                     Toast.makeText(getApplicationContext(),
-                            "no entra en try "+sFTP, Toast.LENGTH_SHORT);
+                            "error al establecer conexion", Toast.LENGTH_SHORT);
 
             toast1.show();
             valid = false;
         }
         return valid;
     }
-
     public void iniciado(View v){
         boolean valid;
         valid = checkserver();
@@ -82,8 +82,25 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         }
         else{
-            //toast de que no naja
+            Toast toast1 =
+                    Toast.makeText(getApplicationContext(),
+                            "error al intentar conectar a: \n"+sFTP, Toast.LENGTH_SHORT);
+
+            toast1.show();
         }
     }
 
+    public boolean connect(String host, String username, String password, int port)
+    {
+        boolean valid = false;
+        try
+        {
+            engine = new asyncConnexion(host, username, password, port);
+            return engine.execute().get();
+        }
+        catch (Exception e)
+        {
+            return false;
+        }
+    }
 }

@@ -7,9 +7,13 @@ import android.os.Environment;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
-public class FileLister extends AppCompatActivity {
+public class FileLister extends MainActivity {
 
     String filename ="";
     File Savelocation = null;
@@ -46,6 +50,32 @@ public class FileLister extends AppCompatActivity {
                     //ignorar
                 }
             }
+        }
+    }
+    public void uploader(){
+        File firstLocalFile = new File("D:/Test/Projects.zip");
+
+        String firstRemoteFile = "Projects.zip";
+        InputStream inputStream = null;
+        try {
+            inputStream = new FileInputStream(firstLocalFile);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        boolean done = false;
+        try {
+            done = engine.mFTPClient.storeFile(firstRemoteFile, inputStream);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            inputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if (done) {
+            System.out.println("The first file is uploaded successfully.");
         }
     }
     public void fileread(){
