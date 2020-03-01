@@ -5,9 +5,14 @@ import android.util.Log;
 
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
+
+import java.io.IOException;
+
 public class asyncConnexion extends AsyncTask<Void, Void, Boolean>
 {
     public FTPClient mFTPClient = null;
+    public boolean status = false;
+    public String grid ="";
     private String host;
     private String username;
     private String password;
@@ -29,10 +34,10 @@ public class asyncConnexion extends AsyncTask<Void, Void, Boolean>
             // connecting to the host
             mFTPClient.connect(host, port);
             // now check the reply code, if positive mean connection success
-            boolean status = mFTPClient.login(username, password);
-
-            mFTPClient.setFileType(FTP.BINARY_FILE_TYPE);
+            status = mFTPClient.login(username, password);
+            //mFTPClient.setFileType(FTP.BINARY_FILE_TYPE);
             mFTPClient.enterLocalPassiveMode();
+            grid = lister();
             return status;
 
         } catch (Exception e) {
@@ -41,5 +46,18 @@ public class asyncConnexion extends AsyncTask<Void, Void, Boolean>
 
         }
         return false;
+    }
+    public String lister(){
+        String fieldfiller = "";
+        try {
+            String[] filesNames = mFTPClient.listNames(MainActivity.currentpath);
+
+            for(int i = 0; i< filesNames.length; i++) {
+                fieldfiller = fieldfiller + filesNames[i]+ "\n";
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return fieldfiller;
     }
 }

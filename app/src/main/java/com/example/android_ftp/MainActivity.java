@@ -35,10 +35,11 @@ import org.apache.commons.net.util.TrustManagerUtils;
 public class MainActivity extends AppCompatActivity {
 
     public asyncConnexion engine;
-    private String sFTP = "";
-    private int sPort = 0;
-    private String sUser = "";
-    private String sPassword = "";
+    public static String sFTP = "";
+    public static String currentpath = "/";
+    public static int sPort = 0;
+    public static String sUser = "";
+    public static String sPassword = "";
     private EditText ip;
     private EditText port;
     private EditText user;

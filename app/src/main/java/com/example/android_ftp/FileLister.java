@@ -4,6 +4,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.os.Environment;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.TextView;
+
+import org.apache.commons.net.ftp.FTPFile;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -19,10 +24,14 @@ public class FileLister extends MainActivity {
     File Savelocation = null;
     FileOutputStream fileOut = null;
     ByteArrayOutputStream fileget = null;
+    private EditText dir;
+    private TextView filegrid;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_file_lister);
+        dir = findViewById(R.id.directory);
+        filegrid = findViewById(R.id.filedisplay);
         //Comprobar si la SD está montada, para guardar en SD/FTP o en INTERNA/FTP
         if((Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) &&
                 (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED_READ_ONLY))){
@@ -31,6 +40,7 @@ public class FileLister extends MainActivity {
         else{
             Savelocation = Environment.getRootDirectory();
         }
+        reconnect();
     }
     public void downloader(){
         try{
@@ -78,7 +88,24 @@ public class FileLister extends MainActivity {
             System.out.println("The first file is uploaded successfully.");
         }
     }
-    public void fileread(){
+    public void fileread() {
 
+    }
+
+    public void actualizado(View v){
+        MainActivity.currentpath=dir.getText().toString();
+        reconnect();
+    }
+
+    public void reconnect(){
+        //volvemos a conectar
+        try {
+            engine.mFTPClient.abort();
+        }
+        catch(Exception e){
+
+        }
+        connect(sFTP,sUser,sPassword,sPort);
+        filegrid.setText(engine.grid);
     }
 }
