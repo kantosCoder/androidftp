@@ -16,6 +16,7 @@
         android:ems="10"
         android:hint="Direccion IP"
         android:inputType="textPersonName"
+        android:text="files.000webhost.com"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView3" />
 
@@ -52,6 +53,7 @@
         android:ems="10"
         android:hint="Usuario"
         android:inputType="textPersonName"
+        android:text="ftpdepomares"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/ipfield" />
 
@@ -87,6 +89,7 @@
         android:ems="10"
         android:hint="Contraseña"
         android:inputType="textPersonName"
+        android:text="(rfx8u3d8!rcy!y7Ez@T"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/userfield" />
 

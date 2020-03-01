@@ -6,7 +6,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -30,40 +32,58 @@ import org.apache.commons.net.util.TrustManagerUtils;
 
 public class MainActivity extends AppCompatActivity {
 
-    FTPClient client = new FTPClient();
+    FTPClient client;
     private String sFTP = "";
     private String sPort ="";
     private String sUser = "";
     private String sPassword = "";
-    private TextView ip;
-    private TextView port;
-    private TextView user;
-    private TextView pass;
+    private EditText ip;
+    private EditText port;
+    private EditText user;
+    private EditText pass;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        client = new FTPClient();
         ip = findViewById(R.id.ipfield);
         port = findViewById(R.id.portfield);
         user = findViewById(R.id.userfield);
         pass = findViewById(R.id.passfield);
     }
 
-    protected void checkserver(){
+    protected boolean checkserver(){
+        boolean valid = false;
         //obtener valores de campos
+        sFTP = ip.getText().toString();
+        sPort = port.getText().toString();
+        sUser = user.getText().toString();
+        sPassword = pass.getText().toString();
         try {
-            client.connect(sFTP+":"+sPort);
-            boolean login = client.login(sUser,sPassword);
-            //como es valido, pasar a la siguiente pantalla con un intent
+            client.connect(sFTP);
+            valid = client.login(sUser,sPassword);
         }
         catch (Exception e) {
-            //mensaje de error al conectar toast
+            Toast toast1 =
+                    Toast.makeText(getApplicationContext(),
+                            "no entra en try "+sFTP, Toast.LENGTH_SHORT);
+
+            toast1.show();
+            valid = false;
         }
+        return valid;
     }
 
     public void iniciado(View v){
-        Intent intent= new Intent(this, FileLister.class);
-        startActivity(intent);
+        boolean valid;
+        valid = checkserver();
+        if(valid){
+            Intent intent= new Intent(this, FileLister.class);
+            startActivity(intent);
+        }
+        else{
+            //toast de que no naja
+        }
     }
 
 }
