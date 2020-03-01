@@ -2,8 +2,10 @@ package com.example.android_ftp;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
+import android.view.View;
 import android.widget.TextView;
 
 import java.io.ByteArrayOutputStream;
@@ -57,6 +59,11 @@ public class MainActivity extends AppCompatActivity {
         catch (Exception e) {
             //mensaje de error al conectar toast
         }
+    }
+
+    public void iniciado(View v){
+        Intent intent= new Intent(this, FileLister.class);
+        startActivity(intent);
     }
 
 }
