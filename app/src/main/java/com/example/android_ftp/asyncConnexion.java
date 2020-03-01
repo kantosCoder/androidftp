@@ -53,7 +53,7 @@ public class asyncConnexion extends AsyncTask<Void, Void, Boolean>
             String[] filesNames = mFTPClient.listNames(MainActivity.currentpath);
 
             for(int i = 0; i< filesNames.length; i++) {
-                fieldfiller = fieldfiller + filesNames[i]+ "\n";
+                fieldfiller = fieldfiller +"/"+ filesNames[i]+ "\n";
             }
         } catch (IOException e) {
             e.printStackTrace();
