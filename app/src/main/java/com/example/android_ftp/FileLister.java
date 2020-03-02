@@ -7,7 +7,9 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
@@ -37,6 +39,7 @@ import java.net.UnknownHostException;
 
 public class FileLister extends MainActivity {
 
+    private static final int READ_REQUEST_CODE = 42;
     long startTime = System.currentTimeMillis() ;
     Context ctxt;
     String filename ="";
@@ -47,7 +50,9 @@ public class FileLister extends MainActivity {
     private String currentdir;
     private EditText dir2;
     private String currentfilename;
+    private String filePath;
     private TextView filegrid;
+    private File filetoload = null;
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
     private static String[] PERMISSIONS_STORAGE = {
             Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -76,6 +81,33 @@ public class FileLister extends MainActivity {
             );
         }
     }
+    //seleccion del archivo a subir
+    public void fileselect(View v){
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("*/*");
+
+        startActivityForResult(intent, READ_REQUEST_CODE);
+    }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode,
+                                 Intent resultData) {
+        if (requestCode == READ_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            Uri uri = null;
+            if (resultData != null) {
+                uri = resultData.getData();
+                filetoload = new File(uri.getPath());
+                final String[] split = filetoload.getPath().split(":");
+                filePath = split[1];
+                filetoload = new File(filePath);
+                Toast toast1 =
+                        Toast.makeText(getApplicationContext(),
+                                Environment.getExternalStorageDirectory()+"/"+filetoload.getPath()+" Y "+filetoload.getName(), Toast.LENGTH_LONG);
+                toast1.show();
+            }
+        }
+    }
+
     public void downloader(View v){
         try {
             engine.mFTPClient.disconnect();
@@ -88,14 +120,31 @@ public class FileLister extends MainActivity {
         async.execute();
     }
     public void uploader(View v){
-        try {
-            engine.mFTPClient.disconnect();
-        } catch (IOException e) {
+
+        /*
+        uploadTask async=new uploadTask();
+        async.execute();*/
+
+        try
+        {
+                //engine.mFTPClient.enterLocalPassiveMode(); // important!
+                //engine.mFTPClient.setFileType(FTP.BINARY_FILE_TYPE);
+                String data = Environment.getExternalStorageDirectory()+"/"+filetoload.getPath();
+                FileInputStream in = new FileInputStream(new File(data));
+                boolean result = engine.mFTPClient.storeFile("/"+filetoload.getName(), in);
+                in.close();
+                if (result) Log.v("upload result", "succeeded");
+                engine.mFTPClient.logout();
+                engine.mFTPClient.disconnect();
+        }
+        catch (Exception e)
+        {
+            Toast toast1 =
+                    Toast.makeText(getApplicationContext(),
+                            "error ", Toast.LENGTH_SHORT);
+            toast1.show();
             e.printStackTrace();
         }
-        currentfilename = dir2.getText().toString();
-        uploadTask async=new uploadTask();
-        async.execute();
     }
 
     //async de descarga
@@ -172,38 +221,31 @@ public class FileLister extends MainActivity {
 
         @Override
         protected String doInBackground(String... params) {
-            try {
-                try {
-                    try {
-                        mFtpClient.connect(sFTP);
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                    status = mFtpClient.login(sUser, sPassword);
-                } catch (SocketException e) {
-                    throw e;
-                }
-                catch (UnknownHostException e) {
-                    throw e;
-                }
-                catch (IOException e) {
-                    throw e;
-                }
-                boolean status = false;
-                try {
-                    InputStream srcFileStream = new BufferedInputStream((new FileInputStream(getExternalFilesDir(Environment.getDataDirectory().getAbsolutePath()).getAbsolutePath()+"/Download"+currentfilename)));
-                    mFtpClient.setFileType(org.apache.commons.net.ftp.FTP.BINARY_FILE_TYPE);
-                    status = mFtpClient.storeFile(currentfilename, srcFileStream);
-                    Log.e("Status", String.valueOf(status));
-                    srcFileStream.close();
-                } catch (Exception e) {
-                    throw e;
-                }
+            FTPClient con = null;
 
-                return new String("Upload Successful");
-            } catch (Exception e) {
-                return "d";
+            try
+            {
+                con = new FTPClient();
+                con.connect(sFTP);
+
+                if (con.login(sUser, sPassword))
+                {
+                    con.enterLocalPassiveMode(); // important!
+                    con.setFileType(FTP.BINARY_FILE_TYPE);
+                    String data = "/"+filetoload.getPath();
+                    FileInputStream in = new FileInputStream(new File(data));
+                    boolean result = con.storeFile("/"+filetoload.getName(), in);
+                    in.close();
+                    if (result) Log.v("upload result", "succeeded");
+                    con.logout();
+                    con.disconnect();
+                }
             }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+            return "d";
         }
     }
     public void uploader(){

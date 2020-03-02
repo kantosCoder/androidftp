@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.FileUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -34,6 +35,7 @@ import org.apache.commons.net.util.TrustManagerUtils;
 
 public class MainActivity extends AppCompatActivity {
 
+
     public asyncConnexion engine;
     public static String sFTP = "";
     public static String currentpath = "/";
@@ -53,6 +55,8 @@ public class MainActivity extends AppCompatActivity {
         user = findViewById(R.id.userfield);
         pass = findViewById(R.id.passfield);
     }
+
+
 
     protected boolean checkserver(){
         boolean valid = false;
