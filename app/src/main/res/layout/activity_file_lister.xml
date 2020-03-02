@@ -85,6 +85,7 @@
         android:layout_marginStart="40dp"
         android:layout_marginLeft="40dp"
         android:layout_marginTop="69dp"
+        android:onClick="downloader"
         android:text="Descargar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/filedisplay" />
@@ -96,6 +97,7 @@
         android:layout_marginStart="118dp"
         android:layout_marginLeft="118dp"
         android:layout_marginTop="69dp"
+        android:onClick="uploader"
         android:text="Subir"
         app:layout_constraintStart_toEndOf="@+id/downloadbutton"
         app:layout_constraintTop_toBottomOf="@+id/filedisplay" />

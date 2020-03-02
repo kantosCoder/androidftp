@@ -35,7 +35,7 @@ public class asyncConnexion extends AsyncTask<Void, Void, Boolean>
             mFTPClient.connect(host, port);
             // now check the reply code, if positive mean connection success
             status = mFTPClient.login(username, password);
-            //mFTPClient.setFileType(FTP.BINARY_FILE_TYPE);
+            mFTPClient.setFileType(FTP.BINARY_FILE_TYPE);
             mFTPClient.enterLocalPassiveMode();
             grid = lister();
             return status;

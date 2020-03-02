@@ -86,7 +86,6 @@ public class MainActivity extends AppCompatActivity {
             Toast toast1 =
                     Toast.makeText(getApplicationContext(),
                             "error al intentar conectar a: \n"+sFTP, Toast.LENGTH_SHORT);
-
             toast1.show();
         }
     }
