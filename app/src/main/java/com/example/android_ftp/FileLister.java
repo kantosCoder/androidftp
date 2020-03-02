@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -52,6 +53,7 @@ public class FileLister extends MainActivity {
     private String currentfilename;
     private String filePath;
     private TextView filegrid;
+    private EditText dentrodelfichero;
     private File filetoload = null;
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
     private static String[] PERMISSIONS_STORAGE = {
@@ -66,6 +68,8 @@ public class FileLister extends MainActivity {
         dir = findViewById(R.id.directory);
         dir2 = findViewById(R.id.directory2);
         filegrid = findViewById(R.id.filedisplay);
+        dentrodelfichero = findViewById(R.id.dentrodelfichero);
+
         reconnect();
     }
     public static void verifyStoragePermissions(Activity activity) {
@@ -147,11 +151,62 @@ public class FileLister extends MainActivity {
         }
     }
 
+
+    public String cacahuete(){
+        FTPClient mFtpClient =null;
+        Boolean status = false;
+        String hola = "";
+        try {
+            try {
+                try {
+                    mFtpClient.connect(sFTP);
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+                status = mFtpClient.login(sUser, sPassword);
+            } catch (SocketException e) {
+                throw e;
+            }
+            catch (UnknownHostException e) {
+                throw e;
+            }
+            catch (IOException e) {
+                throw e;
+            }
+            File downloadFile=new File("/");
+            File parentDir = downloadFile.getParentFile();
+
+            OutputStream outputStream = null;
+            try {
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                mFtpClient.retrieveFile(dir2.getText().toString(), baos);
+                hola = new String(baos.toByteArray());
+                baos.close();
+
+            } catch (Exception e) {
+                throw e;
+            }
+            finally {
+                if (outputStream != null) {
+                    try {
+                        outputStream.close();
+                    } catch (IOException e) {
+                        throw e;
+                    }
+                }
+            }
+
+            return hola;
+        }catch (Exception e){
+            String t="Failure : " + e.getLocalizedMessage();
+            return t;
+        }
+    }
+
     //async de descarga
     class downloadTask extends AsyncTask<String, Void, String> {
 
-        private FTPClient mFtpClient =null;
-        Boolean status = false;
+
         @Override
         protected void onPreExecute(){
             super.onPreExecute();
@@ -159,57 +214,19 @@ public class FileLister extends MainActivity {
 
         @Override
         protected String doInBackground(String... params) {
-            try {
-                try {
-                    try {
-                        mFtpClient.connect(sFTP);
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                    status = mFtpClient.login(sUser, sPassword);
-                } catch (SocketException e) {
-                    throw e;
-                }
-                catch (UnknownHostException e) {
-                    throw e;
-                }
-                catch (IOException e) {
-                    throw e;
-                }
-                File downloadFile=new File("/");
-                File parentDir = downloadFile.getParentFile();
-                if (!parentDir.exists())
-                    parentDir.mkdir();
-                OutputStream outputStream = null;
-                try {
-                    outputStream = new BufferedOutputStream(new FileOutputStream(downloadFile));
-                    mFtpClient.setFileType(FTPClient.BINARY_FILE_TYPE);
-                    status= mFtpClient.retrieveFile(currentdir, outputStream);
-                    Log.e("Status", String.valueOf(status));
-                } catch (Exception e) {
-                    throw e;
-                }
-                finally {
-                    if (outputStream != null) {
-                        try {
-                            outputStream.close();
-                        } catch (IOException e) {
-                            throw e;
-                        }
-                    }
-                }
 
-                return new String("Download Successful");
-            }catch (Exception e){
-                String t="Failure : " + e.getLocalizedMessage();
-                return t;
-            }
+
+            return null;
         }
         @Override
         protected void onPostExecute(String str) {
+            String texto = cacahuete();
+            dentrodelfichero.setText(texto);
             reconnect();
         }
     }
+
+
     //async de subida de datos
     class uploadTask extends AsyncTask<String, Void, String> {
         private FTPClient mFtpClient =null;
