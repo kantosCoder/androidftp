@@ -2,7 +2,6 @@ package com.example.android_ftp;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-
 import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
