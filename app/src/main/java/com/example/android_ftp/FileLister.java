@@ -24,6 +24,7 @@ import org.apache.commons.net.ftp.FTPClient;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -32,10 +33,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.SocketException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 
 public class FileLister extends MainActivity {
 
@@ -47,6 +50,7 @@ public class FileLister extends MainActivity {
     FileOutputStream fileOut = null;
     ByteArrayOutputStream fileget = null;
     private EditText dir;
+    private TextView typefile;
     private String currentdir;
     private EditText dir2;
     private String currentfilename;
@@ -66,6 +70,7 @@ public class FileLister extends MainActivity {
         dir = findViewById(R.id.directory);
         dir2 = findViewById(R.id.directory2);
         filegrid = findViewById(R.id.filedisplay);
+        typefile = findViewById(R.id.typeofile);
         reconnect();
     }
     public static void verifyStoragePermissions(Activity activity) {
@@ -109,22 +114,30 @@ public class FileLister extends MainActivity {
     }
 
     public void downloader(View v){
-        try {
-            engine.mFTPClient.disconnect();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        currentdir = dir.getText().toString();
-        verifyStoragePermissions(this);
-        downloadTask async=new downloadTask();
-        async.execute();
+        downloadtask filedown = new downloadtask();
+        filedown.execute();
+        typefile.setText("Archivo actual:");
     }
+    public String downloadprocedure(){
+        String result="";
+        ByteArrayOutputStream streamer = new ByteArrayOutputStream();
+
+                try {
+                    engine.mFTPClient.retrieveFile("/"+dir2.getText().toString(), streamer);
+                    result = new String(streamer.toByteArray());
+                    streamer.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+        return result;
+    }
+
     public void uploader(View v){
 
         /*
         uploadTask async=new uploadTask();
         async.execute();*/
-
+        /*
         try
         {
                 //engine.mFTPClient.enterLocalPassiveMode(); // important!
@@ -145,69 +158,44 @@ public class FileLister extends MainActivity {
             toast1.show();
             e.printStackTrace();
         }
+        InputStream stream = null;
+        try {
+            stream = new ByteArrayInputStream(filetoload.toString().getBytes(StandardCharsets.UTF_8.name()));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        Boolean result = null;
+        try {
+            result = engine.mFTPClient.storeFile("/"+filetoload.getName(), stream);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            stream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if(result){
+           filegrid.setText("DONE");
+        }else{
+            filegrid.setText("No creado");
+        }
+    }
+    */
     }
 
     //async de descarga
-    class downloadTask extends AsyncTask<String, Void, String> {
-
-        private FTPClient mFtpClient =null;
-        Boolean status = false;
+    private class downloadtask extends AsyncTask<Void, Void, String>{
         @Override
-        protected void onPreExecute(){
-            super.onPreExecute();
+        protected String doInBackground(Void... voids){
+
+            return downloadprocedure();
         }
 
         @Override
-        protected String doInBackground(String... params) {
-            try {
-                try {
-                    try {
-                        mFtpClient.connect(sFTP);
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                    status = mFtpClient.login(sUser, sPassword);
-                } catch (SocketException e) {
-                    throw e;
-                }
-                catch (UnknownHostException e) {
-                    throw e;
-                }
-                catch (IOException e) {
-                    throw e;
-                }
-                File downloadFile=new File("/");
-                File parentDir = downloadFile.getParentFile();
-                if (!parentDir.exists())
-                    parentDir.mkdir();
-                OutputStream outputStream = null;
-                try {
-                    outputStream = new BufferedOutputStream(new FileOutputStream(downloadFile));
-                    mFtpClient.setFileType(FTPClient.BINARY_FILE_TYPE);
-                    status= mFtpClient.retrieveFile(currentdir, outputStream);
-                    Log.e("Status", String.valueOf(status));
-                } catch (Exception e) {
-                    throw e;
-                }
-                finally {
-                    if (outputStream != null) {
-                        try {
-                            outputStream.close();
-                        } catch (IOException e) {
-                            throw e;
-                        }
-                    }
-                }
-
-                return new String("Download Successful");
-            }catch (Exception e){
-                String t="Failure : " + e.getLocalizedMessage();
-                return t;
-            }
-        }
-        @Override
-        protected void onPostExecute(String str) {
-            reconnect();
+        protected void onPostExecute(String s) {
+            filegrid.setText(s);
+            super.onPostExecute(s);
         }
     }
     //async de subida de datos
@@ -248,37 +236,13 @@ public class FileLister extends MainActivity {
             return "d";
         }
     }
-    public void uploader(){
-        File firstLocalFile = new File("D:/Test/Projects.zip");
 
-        String firstRemoteFile = "Projects.zip";
-        InputStream inputStream = null;
-        try {
-            inputStream = new FileInputStream(firstLocalFile);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        boolean done = false;
-        try {
-            done = engine.mFTPClient.storeFile(firstRemoteFile, inputStream);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try {
-            inputStream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        if (done) {
-            System.out.println("The first file is uploaded successfully.");
-        }
-    }
     public void fileread() {
 
     }
 
     public void actualizado(View v){
+        typefile.setText("Directorio actual:");
         MainActivity.currentpath=dir.getText().toString();
         reconnect();
     }
