@@ -131,21 +131,4 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/filedisplay" />
 
-    <EditText
-        android:id="@+id/dentrodelfichero"
-        android:layout_width="297dp"
-        android:layout_height="51dp"
-        android:layout_marginStart="76dp"
-        android:layout_marginLeft="76dp"
-        android:layout_marginTop="62dp"
-        android:layout_marginEnd="122dp"
-        android:layout_marginRight="122dp"
-        android:layout_marginBottom="105dp"
-        android:ems="10"
-        android:inputType="textPersonName"
-        android:text="Name"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/downloadbutton" />
 </androidx.constraintlayout.widget.ConstraintLayout>
