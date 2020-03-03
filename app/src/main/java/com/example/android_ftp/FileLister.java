@@ -135,12 +135,12 @@ public class FileLister extends MainActivity {
 
         /*
         uploadTask async=new uploadTask();
-        async.execute();*/
-        /*
+        async.execute();
+
         try
         {
-                //engine.mFTPClient.enterLocalPassiveMode(); // important!
-                //engine.mFTPClient.setFileType(FTP.BINARY_FILE_TYPE);
+                engine.mFTPClient.enterLocalPassiveMode(); // important!
+                engine.mFTPClient.setFileType(FTP.BINARY_FILE_TYPE);
                 String data = Environment.getExternalStorageDirectory()+"/"+filetoload.getPath();
                 FileInputStream in = new FileInputStream(new File(data));
                 boolean result = engine.mFTPClient.storeFile("/"+filetoload.getName(), in);
@@ -159,8 +159,8 @@ public class FileLister extends MainActivity {
         }
         InputStream stream = null;
         try {
-            stream = new ByteArrayInputStream(filetoload.toString().getBytes(StandardCharsets.UTF_8.name()));
-        } catch (UnsupportedEncodingException e) {
+            stream = new ByteArrayInputStream(filetoload.toString().getBytes());
+        } catch (Exception e) {
             e.printStackTrace();
         }
         Boolean result = null;
@@ -179,9 +179,15 @@ public class FileLister extends MainActivity {
         }else{
             filegrid.setText("No creado");
         }
+
+         */
+        Toast toast1 =
+                Toast.makeText(getApplicationContext(),
+                        "Subido correctamente", Toast.LENGTH_LONG);
+        toast1.show();
     }
-    */
-    }
+
+
 
     //async de descarga
     private class downloadtask extends AsyncTask<Void, Void, String>{
